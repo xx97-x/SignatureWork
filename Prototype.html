@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Founder's Compass</title>
+
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+    
+    :root {
+        --primary-color: #4a5568; 
+        --secondary-color: #6366f1; 
+        --accent-color: #e0f2fe; 
+        --text-color: #2d3748;
+        --container-bg: #fff;
+    }
+    
+    body {
+       
+        font-family: 'Times New Roman', serif;
+        font-size: 12pt; 
+        background: var(--accent-color);
+        color: var(--text-color);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 2rem 1rem;
+    }
+
+    .main-container {
+        max-width: 900px;
+        width: 100%;
+        background: var(--container-bg);
+        padding: 3rem 2rem;
+        border-radius: 1.5rem;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        text-align: center;
+    }
+
+    h1, h2 {
+       
+        font-family: 'Times New Roman', serif;
+        font-weight: 700;
+        color: var(--primary-color);
+    }
+
+    .intro-text {
+        color: #718096;
+        line-height: 1.6;
+    }
+
+    
+    .choice-button {
+        background-color: var(--secondary-color);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 9999px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600;
+    }
+    
+    .choice-button:hover {
+        background-color: #4338ca;
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 6px 10px -1px rgba(0, 0, 0, 0.15);
+    }
+
+    .feedback-box {
+        border-left: 4px solid var(--secondary-color);
+        background-color: var(--accent-color);
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        margin-top: 2rem;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: slideUpAndFadeIn 0.8s forwards;
+    }
+
+    @keyframes slideUpAndFadeIn {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="main-container">
+   
+    <div id="simulation-wrapper" class="space-y-8"></div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        const simulationWrapper = document.getElementById('simulation-wrapper');
+
+        const founderScenarios = [
+            {
+                phase: 'Seed Stage',
+                prompt: 'You need initial capital. Do you A. use your personal savings (bootstrapping) or B. pitch to an angel investor?',
+                options: [
+                    {
+                        label: 'A. Bootstrapping',
+                        consequence: 'By bootstrap you retain 100% of your company and full control...'
+                    },
+                    {
+                        label: 'B. Seek angel investor capital',
+                        consequence: '...'
+                    }
+                ]
+            },
+            {
+                phase: 'Early-Stage Fundraising',
+                prompt: 'You have some early users. Now, you have two offers. A prominent VC firm offers a large, speculative investment. A strategic corporate partner offers a smaller investment with a long-term collaboration deal. Which path do you take?',
+                options: [
+                    {
+                        label: 'A. Take VC investment',
+                        consequence: 'Venture capital provides a massive cash injection'
+                    },
+                    {
+                        label: 'B. Partner with corporation',
+                        consequence: 'A strategic partnership comes with industry expertiseand leads to more stable, sustainable growth. However, it may limit your independence and future flexibility in the long run.'
+                    }
+                ]
+            },
+            {
+                phase: 'Growth & Scaling',
+                prompt: 'Your company is growing rapidly and generating a healthy profit. You want to expand into a new market. Do you use your company\'s existing cash flow to fund this expansion, or do you take on a line of debt to finance it more quickly?',
+                options: [
+                    {
+                        label: 'A.Existing cash flow',
+                        consequence: 'This allows you to ...'
+                    },
+                    {
+                        label: 'B. Debt',
+                        consequence: '...'
+                    }
+                ]
+            }
+        ];
+
+        let currentScenarioIndex = 0;
+
+        const renderIntroScreen = () => {
+            const introHtml = `
+                <div class="text-center transition-opacity duration-700 ease-in opacity-0">
+                    <h1 class="text-4xl lg:text-5xl font-bold mb-4">Founder's Compass</h1>
+                    <button id="start-journey-btn" class="choice-button">
+                        Begin
+                    </button>
+                </div>
+            `;
+            simulationWrapper.innerHTML = introHtml;
+            setTimeout(() => {
+                simulationWrapper.querySelector('div').style.opacity = '1';
+            }, 50);
+
+            document.getElementById('start-journey-btn').addEventListener('click', () => {
+                renderCurrentScenario();
+            });
+        };
+
+        const renderCurrentScenario = () => {
+            if (currentScenarioIndex >= founderScenarios.length) {
+                presentEndScreen();
+                return;
+            }
+
+            const scenario = founderScenarios[currentScenarioIndex];
+
+            const scenarioHtml = `
+                <div id="scenario-${currentScenarioIndex}" class="scenario-stage text-left transition-opacity duration-700 ease-in opacity-0">
+                    <h2 class="text-3xl font-semibold mb-2 text-secondary-color">${scenario.phase}</h2>
+                    <p class="text-xl leading-relaxed text-gray-700 mb-8">${scenario.prompt}</p>
+                    <div id="choices-grid" class="grid gap-6 md:grid-cols-2">
+                        ${scenario.options.map((option, index) => `
+                            <button class="choice-button text-base md:text-lg choice-trigger" data-choice-index="${index}">
+                                ${option.label}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div id="feedback-panel" class="feedback-box hidden">
+                        <p id="feedback-text" class="text-base md:text-lg text-primary-color"></p>
+                    </div>
+                    <div id="next-stage-btn-container" class="mt-8 hidden">
+                        <button id="next-stage-btn" class="choice-button text-base md:text-lg">
+                            Proceed to Next Stage
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            simulationWrapper.innerHTML = scenarioHtml;
+           
+            setTimeout(() => {
+                document.getElementById(`scenario-${currentScenarioIndex}`).style.opacity = '1';
+            }, 50);
+
+            setupChoiceHandlers();
+        };
+
+        
+        const setupChoiceHandlers = () => {
+            const choiceButtons = document.querySelectorAll('.choice-trigger');
+            const feedbackPanel = document.getElementById('feedback-panel');
+            const feedbackText = document.getElementById('feedback-text');
+            const nextStageBtn = document.getElementById('next-stage-btn');
+            const nextStageBtnContainer = document.getElementById('next-stage-btn-container');
+
+            choiceButtons.forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const choiceIndex = event.target.dataset.choiceIndex;
+                    const selectedOption = founderScenarios[currentScenarioIndex].options[choiceIndex];
+
+                    
+                    choiceButtons.forEach(btn => btn.disabled = true);
+
+                   
+                    feedbackText.textContent = selectedOption.consequence;
+                    feedbackPanel.classList.remove('hidden');
+
+                    setTimeout(() => {
+                      nextStageBtnContainer.classList.remove('hidden');
+                    }, 1000);
+                });
+            });
+
+            
+            nextStageBtn.addEventListener('click', () => {
+                currentScenarioIndex++;
+                renderCurrentScenario();
+            });
+        };
+
+       
+        const presentEndScreen = () => {
+            const endScreenHtml = `
+                <div class="text-center transition-opacity duration-700 ease-in opacity-0">
+                    <h2 class="text-4xl lg:text-5xl font-bold text-secondary-color mb-4">Journey Complete!</h2>
+                    <p class="text-xl leading-relaxed text-gray-700 mb-8 max-w-2xl mx-auto">
+                        Congratulations! You have navigated the foundational stages of a startup's financial lifecycle.
+
+                    </p>
+                    <button id="restart-btn" class="choice-button">
+                        Start Over
+                    </button>
+                </div>
+            `;
+            simulationWrapper.innerHTML = endScreenHtml;
+            setTimeout(() => {
+                simulationWrapper.querySelector('div').style.opacity = '1';
+            }, 50);
+
+            document.getElementById('restart-btn').addEventListener('click', () => {
+                currentScenarioIndex = 0;
+                renderCurrentScenario();
+            });
+        };
+
+        
+        renderIntroScreen();
+    });
+</script>
+
+</body>
+</html>
